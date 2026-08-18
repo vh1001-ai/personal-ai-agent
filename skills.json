@@ -1,0 +1,72 @@
+[
+  {
+    "name": "1Password CLI Integration",
+    "category": "Security",
+    "desc": "Automate secret retrieval and secure vault management via 1Password CLI."
+  },
+  {
+    "name": "Adversarial UX & QA Testing",
+    "category": "Quality",
+    "desc": "Roleplay edge-case user behavior to discover bugs, UX friction, and breakages."
+  },
+  {
+    "name": "Autonomous Agent Spawning",
+    "category": "Agents",
+    "desc": "Orchestrate sub-agents concurrently, delegating sub-tasks with isolated context."
+  },
+  {
+    "name": "Codebase Inspection & LOC Analysis",
+    "category": "Development",
+    "desc": "Inspect codebases with Pygount, analyze code density, file distributions, and languages."
+  },
+  {
+    "name": "GitHub PR & Code Review Workflow",
+    "category": "GitHub",
+    "desc": "Review pull requests, construct diffs, add inline comments, and execute pre-commit quality gates."
+  },
+  {
+    "name": "Jupyter Live Kernel Iteration",
+    "category": "Data Science",
+    "desc": "Execute iterative Python data analysis and visualization directly inside a live Jupyter kernel."
+  },
+  {
+    "name": "LLM Evaluation & Benchmarking",
+    "category": "MLOps",
+    "desc": "Run MMLU, GSM8K, and HumanEval harness benchmarks against local and cloud LLMs."
+  },
+  {
+    "name": "vLLM & Llama.cpp Serving",
+    "category": "MLOps",
+    "desc": "Deploy high-throughput GGUF and vLLM inference servers with OpenAI-compatible APIs."
+  },
+  {
+    "name": "Obsidian Knowledge Graph Sync",
+    "category": "Note-Taking",
+    "desc": "Search, edit, link, and structure markdown knowledge vaults in Obsidian."
+  },
+  {
+    "name": "Web Security & OWASP Hardening",
+    "category": "Security",
+    "desc": "Audit web apps for XSS, SQLi, CSRF, and execute pre-commit vulnerability mitigation."
+  },
+  {
+    "name": "3D Web Experience Architecture",
+    "category": "Frontend",
+    "desc": "Build WebGL and Three.js interactive scenes with optimized GLTF asset pipelines."
+  },
+  {
+    "name": "Systematic Debugging Workflow",
+    "category": "Development",
+    "desc": "4-phase root cause debugging: hypothesis, reproduction, isolation, and verification."
+  },
+  {
+    "name": "Test-Driven Development (TDD)",
+    "category": "Development",
+    "desc": "Enforce RED-GREEN-REFACTOR cycle with unit testing before implementation."
+  },
+  {
+    "name": "MicroTik RouterOS & Network Tunneling",
+    "category": "DevOps",
+    "desc": "Configure IPIP, GRE, WireGuard tunnels, PBR routing, and Safe Mode on MikroTik routers."
+  }
+]
