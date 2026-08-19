@@ -4,7 +4,6 @@ from flask import Flask, render_template_string, request, jsonify
 import requests
 
 app = Flask(__name__)
-MEMORY_FILE = "knowledge_base.json"
 KEYS_FILE = "api_keys.json"
 
 def load_data(file, default):
@@ -22,7 +21,7 @@ HTML_TEMPLATE = """
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>هوش مصنوعی شخصی (متصل به OpenAI & Gemini)</title>
+    <title>هوش مصنوعی شخصی (مجهز به سرویس‌های رایگان)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -37,36 +36,37 @@ HTML_TEMPLATE = """
             <h1 class="text-xl font-bold text-sky-400 mb-8 flex items-center gap-2"><i class="fas fa-brain"></i> هوش مصنوعی شخصی</h1>
             <nav class="space-y-3 text-sm">
                 <button onclick="showTab('chat')" class="w-full text-right p-3 rounded-xl hover:bg-white/10 transition flex items-center gap-3"><i class="fas fa-comments"></i> گفتگوی هوشمند</button>
-                <button onclick="showTab('keys')" class="w-full text-right p-3 rounded-xl hover:bg-white/10 transition flex items-center gap-3"><i class="fas fa-key"></i> تنظیم کلید API</button>
+                <button onclick="showTab('keys')" class="w-full text-right p-3 rounded-xl hover:bg-white/10 transition flex items-center gap-3"><i class="fas fa-key"></i> تنظیم کلید API / مدل</button>
             </nav>
         </div>
-        <div class="text-xs text-gray-500 text-center">متصل به سرویس‌های اصلی</div>
+        <div class="text-xs text-emerald-400 text-center bg-emerald-500/10 p-3 rounded-xl border border-emerald-500/20">حالت رایگان (بدون نیاز به کلید) فعال است!</div>
     </aside>
 
     <main class="flex-1 p-8 overflow-y-auto">
         <!-- Chat Tab -->
         <div id="tab-chat" class="h-full flex flex-col glass rounded-3xl p-6">
-            <h2 class="text-xl font-bold mb-4 border-b border-white/10 pb-4">گفتگو با هوش مصنوعی اصلی</h2>
+            <h2 class="text-xl font-bold mb-4 border-b border-white/10 pb-4">گفتگو با هوش مصنوعی</h2>
             <div id="chat-box" class="flex-1 overflow-y-auto space-y-4 mb-4 pr-2">
-                <div class="text-right"><span class="glass p-4 rounded-2xl inline-block text-sm">سلام! برای اینکه من به موتور هوش مصنوعی متصل شوم، لطفاً در بخش "تنظیم کلید API" یک کلید معتبر (مثلاً OpenAI یا Gemini) وارد کنید تا مستقیماً به آن متصل شوم.</span></div>
+                <div class="text-right"><span class="glass p-4 rounded-2xl inline-block text-sm">سلام! من آماده‌ام. به صورت پیش‌فرض از مدل‌های رایگان استفاده می‌کنم و نیازی به وارد کردن کلید API ندارید. هر سوالی دارید بپرسید!</span></div>
             </div>
             <div class="flex gap-4">
-                <input id="chat-input" type="text" placeholder="سوال خود را بپرسید..." class="flex-1 bg-white/5 border border-white/10 p-4 rounded-xl focus:outline-none focus:border-sky-500 text-sm">
+                <input id="chat-input" type="text" placeholder="سوال خود را بپرسید..." class="flex-1 bg-white/5 border border-white/10 p-4 rounded-xl focus:outline-none focus:border-sky-500 text-sm" onkeypress="if(event.key === 'Enter') sendChat()">
                 <button onclick="sendChat()" class="bg-sky-600 px-8 rounded-xl font-bold hover:bg-sky-500 text-sm">ارسال</button>
             </div>
         </div>
 
         <!-- Keys Tab -->
         <div id="tab-keys" class="hidden glass rounded-3xl p-6">
-            <h2 class="text-xl font-bold mb-4 border-b border-white/10 pb-4">اتصال به موتور هوش مصنوعی (API Key)</h2>
-            <p class="text-xs text-gray-400 mb-6">کلید API خود را وارد کنید تا تمام پاسخ‌ها به صورت واقعی از موتور هوش مصنوعی دریافت شوند.</p>
+            <h2 class="text-xl font-bold mb-4 border-b border-white/10 pb-4">انتخاب موتور یا کلید اختصاصی</h2>
+            <p class="text-xs text-gray-400 mb-6">می‌توانید از موتورهای کاملاً رایگان (پیش‌فرض) استفاده کنید یا کلید اختصاصی خود را وارد نمایید.</p>
             <div class="space-y-4 max-w-md mb-6">
                 <select id="key-provider" class="w-full bg-slate-900 border border-white/10 p-3 rounded-xl text-sm">
-                    <option value="OpenAI">OpenAI (ChatGPT)</option>
-                    <option value="Gemini">Google Gemini</option>
+                    <option value="Free-Pollinations">Pollinations AI (کاملاً رایگان و بدون نیاز به کلید)</option>
+                    <option value="OpenAI">OpenAI (نیاز به کلید شخصی)</option>
+                    <option value="Gemini">Google Gemini (نیاز به کلید شخصی)</option>
                 </select>
-                <input id="key-val" type="password" placeholder="sk-..." class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-sm">
-                <button onclick="addKey()" class="bg-emerald-600 w-full py-3 rounded-xl font-bold text-sm hover:bg-emerald-500">ذخیره و اتصال</button>
+                <input id="key-val" type="password" placeholder="اگر سرویس رایگان است، خالی بگذارید..." class="w-full bg-white/5 border border-white/10 p-3 rounded-xl text-sm">
+                <button onclick="addKey()" class="bg-emerald-600 w-full py-3 rounded-xl font-bold text-sm hover:bg-emerald-500">ذخیره تنظیمات</button>
             </div>
             <div id="keys-status" class="text-xs text-sky-400"></div>
         </div>
@@ -80,33 +80,44 @@ HTML_TEMPLATE = """
 
         async function sendChat() {
             const input = document.getElementById('chat-input');
-            if(!input.value) return;
-            const box = document.getElementById('chat-box');
-            box.innerHTML += `<div class="text-left"><span class="bg-sky-600 p-3 rounded-2xl inline-block text-sm">${input.value}</span></div>`;
-            const msg = input.value;
-            input.value = '';
+            const msg = input.value.trim();
+            if(!msg) return;
 
-            const res = await fetch('/chat', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({message: msg})
-            });
-            const data = await res.json();
-            box.innerHTML += `<div class="text-right"><span class="glass p-4 rounded-2xl inline-block text-sm leading-relaxed">${data.reply}</span></div>`;
+            const box = document.getElementById('chat-box');
+            box.innerHTML += `<div class="text-left"><span class="bg-sky-600 p-3 rounded-2xl inline-block text-sm">${msg}</span></div>`;
+            input.value = '';
+            box.scrollTop = box.scrollHeight;
+
+            // Loading state
+            const loadingId = 'loading-' + Date.now();
+            box.innerHTML += `<div id="${loadingId}" class="text-right"><span class="glass p-4 rounded-2xl inline-block text-sm text-gray-400">در حال تفکر...</span></div>`;
+            box.scrollTop = box.scrollHeight;
+
+            try {
+                const res = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({message: msg})
+                });
+                const data = await res.json();
+                document.getElementById(loadingId).remove();
+                box.innerHTML += `<div class="text-right"><span class="glass p-4 rounded-2xl inline-block text-sm leading-relaxed">${data.reply}</span></div>`;
+            } catch(e) {
+                document.getElementById(loadingId).remove();
+                box.innerHTML += `<div class="text-right"><span class="bg-red-500/20 text-red-300 p-4 rounded-2xl inline-block text-sm">خطا در ارتباط با سرور.</span></div>`;
+            }
             box.scrollTop = box.scrollHeight;
         }
 
         async function addKey() {
             const provider = document.getElementById('key-provider').value;
             const key = document.getElementById('key-val').value;
-            if(!key) return alert('لطفاً کلید را وارد کنید');
             await fetch('/add_key', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({provider, key})
             });
-            document.getElementById('keys-status').innerText = '✅ کلید ذخیره شد و هوش مصنوعی آماده پاسخ‌گویی است!';
-            document.getElementById('key-val').value = '';
+            document.getElementById('keys-status').innerText = '✅ تنظیمات با موفقیت ذخیره شد!';
         }
     </script>
 </body>
@@ -126,16 +137,22 @@ def add_key():
 @app.route('/chat', methods=['POST'])
 def chat():
     msg = request.json.get('message', '')
-    keys = load_data(KEYS_FILE, {})
+    keys = load_data(KEYS_FILE, {"provider": "Free-Pollinations", "key": ""})
     
-    provider = keys.get('provider')
-    api_key = keys.get('key')
-    
-    if not api_key:
-        return jsonify({"reply": "⚠️ لطفاً ابتدا در منوی 'تنظیم کلید API' یک کلید معتبر (مثل OpenAI) وارد کنید تا ارتباط برقرار شود."})
+    provider = keys.get('provider', 'Free-Pollinations')
+    api_key = keys.get('key', '')
     
     try:
-        if provider == "OpenAI":
+        if provider == "Free-Pollinations" or not api_key:
+            # Using Pollinations AI public free text generation API
+            url = f"https://text.pollinations.ai/{requests.utils.quote(msg)}"
+            res = requests.get(url, timeout=20)
+            if res.status_code == 200:
+                return jsonify({"reply": res.text})
+            else:
+                return jsonify({"reply": "خطا در دریافت پاسخ از سرور رایگان."})
+                
+        elif provider == "OpenAI":
             headers = {"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"}
             payload = {
                 "model": "gpt-4o-mini",
@@ -146,7 +163,7 @@ def chat():
             if "choices" in data:
                 return jsonify({"reply": data["choices"][0]["message"]["content"]})
             else:
-                return jsonify({"reply": f"خطا از سوی OpenAI: {data.get('error', {}).get('message', 'نامشخص')}"})
+                return jsonify({"reply": f"خطا از OpenAI: {data.get('error', {}).get('message', 'نامشخص')}"})
                 
         elif provider == "Gemini":
             url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={api_key}"
@@ -156,12 +173,12 @@ def chat():
             if "candidates" in data:
                 return jsonify({"reply": data["candidates"][0]["content"]["parts"][0]["text"]})
             else:
-                return jsonify({"reply": f"خطا از سوی Gemini: {data}"})
+                return jsonify({"reply": f"خطا از Gemini: {data}"})
                 
     except Exception as e:
-        return jsonify({"reply": f"خطای اتصال به سرور هوش مصنوعی: {str(e)}"})
+        return jsonify({"reply": f"خطای ارتباطی: {str(e)}"})
 
-    return jsonify({"reply": "سرویس پشتیبانی نمی‌شود."})
+    return jsonify({"reply": "سرویس انتخاب‌شده نامعتبر است."})
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
